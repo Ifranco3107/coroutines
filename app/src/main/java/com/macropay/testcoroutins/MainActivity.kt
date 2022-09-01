@@ -8,6 +8,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
+import com.macropay.testcoroutins.flow.ItemsProvider
+import com.macropay.testcoroutins.flow.MainAdapter
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -22,11 +24,16 @@ class MainActivity : AppCompatActivity(),CoroutineScope {
     private lateinit var job:Job*/
 
 private lateinit var vm: MainViewModel
+    val adapter= MainAdapter()
+    private val observer = { items : List < String > -> adapter.items = items }
 
    // https://www.youtube.com/watch?v=KqLtW8d8PXY&t=3087s
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+
 
     //Para ejemplo[2], con el ejemplo [3], ya no se necesita.
      //   job = SupervisorJob()
@@ -115,6 +122,20 @@ private lateinit var vm: MainViewModel
             vm.onSubmitClicked(username.text.toString(), password.text.toString())
 
         }
+
+
+        //Programacion reactiva;
+        // https://www.youtube.com/watch?v=WvGIHxUYIgA
+       //Flow es similar a rxJava. [8:20]
+       flow.setOnClickListener{
+           //Existen 3 tipos
+           //IO, para acceso a sistemas externos
+           //UI
+           //Computacion, para operacion que requieren de CPU, no es recomendable que se ejecuten muchas reutinas porque se sobrecarga al sistema.
+           //ejemplo de Flow
+           lstMovtos.adapter = adapter
+           ItemsProvider.observable.subscribe { observer }
+       }
     }
 
     fun validateLogin(user: String, pass: String): Boolean {
@@ -131,6 +152,12 @@ private lateinit var vm: MainViewModel
         job.cancel()
         super.onDestroy()
     }*/
+    override fun onDestroy() {
+        //Para evitar problemas de que trate de actualiar la UI, cuando ya no existe la Activity.
+        ItemsProvider.observable.unsubscribe(observer)
+        super.onDestroy()
+    }
+
 }
 
 private fun Context. toast (message: String ) {

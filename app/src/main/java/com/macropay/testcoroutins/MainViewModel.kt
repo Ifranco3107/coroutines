@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 //Para ejemplo[5] [42:00]
+//Pueden existir problemas para cuando se usa @Test .[50:00]
 class MainViewModel:ViewModel()
 {
     private val _loginResult = MutableLiveData<Boolean>()
